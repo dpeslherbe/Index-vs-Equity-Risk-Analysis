@@ -31,6 +31,13 @@ valid.index <- which(stocks$df.control$threshold.decision == 'KEEP')
 invalid.ticker <- stocks$df.control$ticker[invalid.index]
 invalid.ticker
 
+wrong.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & !ret.adjusted.prices == 0)
+right.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & ret.adjusted.prices == 0)
+stocks$df.tickers <- stocks$df.tickers %>% filter(!ref.date == '2020-10-02')
+stocks$df.tickers <- bind_rows(stocks$df.tickers, right.info.index)
+stocks$df.tickers <- stocks$df.tickers %>% mutate(ref.date = as.Date(ref.date, '%d-%m-%Y')) %>% arrange(ref.date)
+index$df.tickers <- index$df.tickers[-192,]
+
 stocks$df.control <- stocks$df.control %>%
   filter((threshold.decision != 'OUT'))
 
@@ -118,21 +125,21 @@ ggplot() +
   labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
 
-shares.return.semi.dev.cumul.mod <- c()
-index.return.semi.dev.cumul.mod <- c()
+shares.return.down.dev.cumul <- c()
+index.return.down.dev.cumul <- c()
 for (j in 1:length(shares.list.cumul)) {
-  shares.return.cumul.mod <- shares.list.cumul[[j]]
-  shares.return.semi.dev.values.mod <- shares.return.cumul.mod[shares.return.cumul.mod <= 0]
-  shares.return.semi.dev.cumul.mod <- c(shares.return.semi.dev.cumul.mod, sqrt((1/length(shares.return.semi.dev.values.mod))*sum((shares.return.semi.dev.values.mod))^2))
-  index.return.cumul.mod <- index.list.cumul[[j]]
-  index.return.semi.dev.values.mod <- index.return.cumul.mod[index.return.cumul.mod <= mean(index.return.cumul)]
-  index.return.semi.dev.cumul.mod <- c(index.return.semi.dev.cumul.mod, sqrt((1/length(index.return.semi.dev.values.mod))*sum((index.return.semi.dev.values.mod))^2))
+  shares.return.cumul <- shares.list.cumul[[j]]
+  shares.return.down.dev.values <- shares.return.cumul[shares.return.cumul <= 0]
+  shares.return.down.dev.cumul <- c(shares.return.down.dev.cumul, sqrt((1/length(shares.return.down.dev.values))*sum((shares.return.down.dev.values))^2))
+  index.return.cumul <- index.list.cumul[[j]]
+  index.return.down.dev.values <- index.return.cumul[index.return.cumul <= 0]
+  index.return.down.dev.cumul <- c(index.return.down.dev.cumul, sqrt((1/length(index.return.down.dev.values))*sum((index.return.down.dev.values))^2))
 }
-return.data <- return.data %>% add_column(shares.return.semi.dev.mod = shares.return.semi.dev.cumul.mod)
-return.data <- return.data %>% add_column(index.return.semi.dev.mod = index.return.semi.dev.cumul.mod)
+return.data <- return.data %>% add_column(shares.return.down.dev = shares.return.down.dev.cumul)
+return.data <- return.data %>% add_column(index.return.down.dev = index.return.down.dev.cumul)
 ggplot() +
-  geom_line(data = return.data, aes(date, shares.return.semi.dev.mod), color = 'blue', size = 1) +
-  geom_line(data = return.data, aes(date, index.return.semi.dev.mod), color = 'black', size = 1) +
+  geom_line(data = return.data, aes(date, shares.return.down.dev), color = 'blue', size = 1) +
+  geom_line(data = return.data, aes(date, index.return.down.dev), color = 'black', size = 1) +
   labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
 
@@ -167,7 +174,7 @@ for (j in 1:length(shares.daily.return)) {
 }
 return.data <- return.data %>% add_column(return.sharpe.ratio = sharpe.ratio.cumul)
 ggplot() +
-  geom_line(data = return.data, aes(date, return.alpha), color = 'blue', size = 1) +
+  geom_line(data = return.data, aes(date, return.sharpe.ratio), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Sharpe Ratio'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
 
@@ -207,56 +214,33 @@ ggplot() +
 
 
 
-capital <- 100000
-shares.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[2])
-shares.number <- capital/shares.data$price.open[1]
-print(c('number of shares is', shares.number))
-shares.price <- shares.data$price.open[1]
-print(c('price of shares was', shares.price))
 
-index.data <- index$df.tickers
-index.number <- capital/index.data$price.open[1]
-print(c('number of index shares is', index.number))
-index.price <- index.data$price.open[1]
-print(c('price of index shares was', index.price))
-
-shares.daily.return <- cumprod(1+(shares.data$ret.adjusted.prices[-1]))-1
-index.daily.return <- cumprod(1+(index.data$ret.adjusted.prices[-1]))-1
-return.data <- tibble(date = index.data$ref.date[-1])
-return.data <- return.data %>% add_column(shares.return.perc = shares.daily.return)
-return.data <- return.data %>% add_column(index.return.perc = index.daily.return)
-ggplot() +
-  geom_line(data = return.data, aes(date, shares.return.perc), color = 'blue', size = 1) +
-  geom_line(data = return.data, aes(date, index.return.perc), color = 'black', size = 1) +
-  labs(title = paste0(random.sample.stocks[2], ' (blue) vs ^GSPC (black)'), 
-       undertitle = 'Cumulative return', x = 'date', y = 'return percentage')
-
-plotlist <- vector(mode = 'list', length = length(random.sample.stocks)/5)
+plotlist <- vector(mode = 'list', length = length(random.sample.stocks)*9/5)
 for (i in 1:(length(random.sample.stocks)/5)) {
   capital <- 100000
-  shares.data1 <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+1])
+  shares1.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+1])
   shares.number1 <- capital/shares.data1$price.open[1]
   shares.price1 <- shares.data1$price.open[1]
-  shares.data2 <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+2])
+  shares2.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+2])
   shares.number2 <- capital/shares.data2$price.open[1]
   shares.price2 <- shares.data2$price.open[1]
-  shares.data3 <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+3])
+  shares3.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+3])
   shares.number3 <- capital/shares.data3$price.open[1]
   shares.price3 <- shares.data3$price.open[1]
-  shares.data4 <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+4])
+  shares4.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+4])
   shares.number4 <- capital/shares.data4$price.open[1]
   shares.price4 <- shares.data4$price.open[1]
-  shares.data5 <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+5])
+  shares5.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[(i-1)*5+5])
   shares.number5 <- capital/shares.data5$price.open[1]
   shares.price5 <- shares.data5$price.open[1]
   index.data <- index$df.tickers
   index.number <- capital/index.data$price.open[1]
   index.price <- index.data$price.open[1]
-  shares1.daily.return <- cumprod(1+(shares.data1$ret.adjusted.prices[-1]))-1
-  shares2.daily.return <- cumprod(1+(shares.data2$ret.adjusted.prices[-1]))-1
-  shares3.daily.return <- cumprod(1+(shares.data3$ret.adjusted.prices[-1]))-1
-  shares4.daily.return <- cumprod(1+(shares.data4$ret.adjusted.prices[-1]))-1
-  shares5.daily.return <- cumprod(1+(shares.data5$ret.adjusted.prices[-1]))-1
+  shares1.daily.return <- cumprod(1+(shares1.data$ret.adjusted.prices[-1]))-1
+  shares2.daily.return <- cumprod(1+(shares2.data$ret.adjusted.prices[-1]))-1
+  shares3.daily.return <- cumprod(1+(shares3.data$ret.adjusted.prices[-1]))-1
+  shares4.daily.return <- cumprod(1+(shares4.data$ret.adjusted.prices[-1]))-1
+  shares5.daily.return <- cumprod(1+(shares5.data$ret.adjusted.prices[-1]))-1
   index.daily.return <- cumprod(1+(index.data$ret.adjusted.prices[-1]))-1
   return.data <- tibble(date = index.data$ref.date[-1])
   return.data <- return.data %>% add_column(shares1.return.perc = shares1.daily.return)
@@ -265,6 +249,54 @@ for (i in 1:(length(random.sample.stocks)/5)) {
   return.data <- return.data %>% add_column(shares4.return.perc = shares4.daily.return)
   return.data <- return.data %>% add_column(shares5.return.perc = shares5.daily.return)
   return.data <- return.data %>% add_column(index.return.perc = index.daily.return)
+  shares1.return.mean.cumul <- c()
+  shares2.return.mean.cumul <- c()
+  shares3.return.mean.cumul <- c()
+  shares4.return.mean.cumul <- c()
+  shares5.return.mean.cumul <- c()
+  index.return.mean.cumul <- c()
+  for (j in 2:length(shares1.data$ret.adjusted.prices)) {
+    shares1.return.mean.cumul <- c(shares1.return.mean.cumul, mean(shares1.data$ret.adjusted.prices[2:j]))
+    shares2.return.mean.cumul <- c(shares2.return.mean.cumul, mean(shares2.data$ret.adjusted.prices[2:j]))
+    shares3.return.mean.cumul <- c(shares3.return.mean.cumul, mean(shares3.data$ret.adjusted.prices[2:j]))
+    shares4.return.mean.cumul <- c(shares4.return.mean.cumul, mean(shares4.data$ret.adjusted.prices[2:j]))
+    shares5.return.mean.cumul <- c(shares5.return.mean.cumul, mean(shares5.data$ret.adjusted.prices[2:j]))
+    index.return.mean.cumul <- c(index.return.mean.cumul, mean(index.data$ret.adjusted.prices[2:j]))
+  }
+  shares1.list.cumul <- vector(mode = 'list', length = (length(shares1.data$ret.adjusted.prices)-1))
+  shares2.list.cumul <- vector(mode = 'list', length = (length(shares2.data$ret.adjusted.prices)-1))
+  shares3.list.cumul <- vector(mode = 'list', length = (length(shares3.data$ret.adjusted.prices)-1))
+  shares4.list.cumul <- vector(mode = 'list', length = (length(shares4.data$ret.adjusted.prices)-1))
+  shares5.list.cumul <- vector(mode = 'list', length = (length(shares5.data$ret.adjusted.prices)-1))
+  index.list.cumul <- vector(mode = 'list', length = (length(index.data$ret.adjusted.prices)-1))
+  shares1.return.std.dev.cumul <- c()
+  shares2.return.std.dev.cumul <- c()
+  shares3.return.std.dev.cumul <- c()
+  shares4.return.std.dev.cumul <- c()
+  shares5.return.std.dev.cumul <- c()
+  index.return.std.dev.cumul <- c()
+  for (j in 1:(length(shares1.data$ret.adjusted.prices)-1)) {
+    shares1.list.cumul[[j]] <- c(shares1.data$ret.adjusted.prices[2:(1+j)])
+    shares2.list.cumul[[j]] <- c(shares2.data$ret.adjusted.prices[2:(1+j)])
+    shares3.list.cumul[[j]] <- c(shares3.data$ret.adjusted.prices[2:(1+j)])
+    shares4.list.cumul[[j]] <- c(shares4.data$ret.adjusted.prices[2:(1+j)])
+    shares5.list.cumul[[j]] <- c(shares5.data$ret.adjusted.prices[2:(1+j)])
+    shares1.return.std.dev.cumul <- c(shares1.return.std.dev.cumul, sqrt(sum((shares1.list.cumul[[j]] - shares1.return.mean.cumul[j])^2)))
+    shares2.return.std.dev.cumul <- c(shares2.return.std.dev.cumul, sqrt(sum((shares2.list.cumul[[j]] - shares2.return.mean.cumul[j])^2)))
+    shares3.return.std.dev.cumul <- c(shares3.return.std.dev.cumul, sqrt(sum((shares3.list.cumul[[j]] - shares3.return.mean.cumul[j])^2)))
+    shares4.return.std.dev.cumul <- c(shares4.return.std.dev.cumul, sqrt(sum((shares4.list.cumul[[j]] - shares4.return.mean.cumul[j])^2)))
+    shares5.return.std.dev.cumul <- c(shares5.return.std.dev.cumul, sqrt(sum((shares5.list.cumul[[j]] - shares5.return.mean.cumul[j])^2)))
+    index.list.cumul[[j]] <- c(index.data$ret.adjusted.prices[2:(1+j)])
+    index.return.std.dev.cumul <- c(index.return.std.dev.cumul, sqrt(sum((index.list.cumul[[j]] - index.return.mean.cumul[j])^2)))
+  }
+  return.data <- return.data %>% add_column(shares1.return.std.dev = shares1.return.std.dev.cumul)
+  return.data <- return.data %>% add_column(shares2.return.std.dev = shares2.return.std.dev.cumul)
+  return.data <- return.data %>% add_column(shares3.return.std.dev = shares3.return.std.dev.cumul)
+  return.data <- return.data %>% add_column(shares4.return.std.dev = shares4.return.std.dev.cumul)
+  return.data <- return.data %>% add_column(shares5.return.std.dev = shares5.return.std.dev.cumul)
+  return.data <- return.data %>% add_column(index.return.std.dev = index.return.std.dev.cumul)
+  
+  if((i %% 9) == 1){
   plotlist[[i]] <- ggplot() +
     geom_line(data = return.data, aes(date, shares1.return.perc, 
                                       colour = paste0(random.sample.stocks[(i-1)*5+1])), 
@@ -291,7 +323,39 @@ for (i in 1:(length(random.sample.stocks)/5)) {
          undertitle = 'Cumulative return', x = 'date', y = 'return percentage') +
     scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
                                                      "#FF9933", "#006600", "#996633"))
-}
+  }
+  if((i %% 9) == 2){
+  plotlist[[i]] <- ggplot() +
+    geom_line(data = return.data, aes(date, shares1.return.std.dev, 
+                                      colour = paste0(random.sample.stocks[(i-1)*5+1])), 
+              size = 1) +
+    geom_line(data = return.data, aes(date, shares2.return.std.dev, 
+                                      colour = paste0(random.sample.stocks[(i-1)*5+2])), 
+              size = 1) +
+    geom_line(data = return.data, aes(date, shares3.return.std.dev, 
+                                      colour = paste0(random.sample.stocks[(i-1)*5+3])), 
+              size = 1) +
+    geom_line(data = return.data, aes(date, shares4.return.std.dev, 
+                                      colour = paste0(random.sample.stocks[(i-1)*5+4])), 
+              size = 1) +
+    geom_line(data = return.data, aes(date, shares5.return.std.dev, 
+                                      colour = paste0(random.sample.stocks[(i-1)*5+5])), 
+              size = 1) +
+    geom_line(data = return.data, aes(date, index.return.std.dev, 
+                                      colour = paste0('^GSPC')), size = 1) +
+    labs(title = paste0(random.sample.stocks[(i-1)*5+1], ', ', 
+                        random.sample.stocks[(i-1)*5+2], ', ', 
+                        random.sample.stocks[(i-1)*5+3], ', ', 
+                        random.sample.stocks[(i-1)*5+4], ', ', 
+                        random.sample.stocks[(i-1)*5+5], ', ', 'vs ^GSPC'), 
+         undertitle = 'Cumulative return', x = 'date', y = 'return percentage') +
+    scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
+                                                     "#FF9933", "#006600", "#996633"))
+  }
+  if((i %% 9) == 3){
+    
+  }
+  }
 
 grid.arrange(plotlist[[1]], plotlist[[2]])
 grid.arrange(plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]])
