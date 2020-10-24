@@ -31,8 +31,8 @@ valid.index <- which(stocks$df.control$threshold.decision == 'KEEP')
 invalid.ticker <- stocks$df.control$ticker[invalid.index]
 invalid.ticker
 
-wrong.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & !ret.adjusted.prices == 0)
-right.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & ret.adjusted.prices == 0)
+wrong.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & ret.adjusted.prices == 0)
+right.info.index <- stocks$df.tickers %>% filter(ref.date == '2020-10-02' & !ret.adjusted.prices == 0)
 stocks$df.tickers <- stocks$df.tickers %>% filter(!ref.date == '2020-10-02')
 stocks$df.tickers <- bind_rows(stocks$df.tickers, right.info.index)
 stocks$df.tickers <- stocks$df.tickers %>% mutate(ref.date = as.Date(ref.date, '%d-%m-%Y')) %>% arrange(ref.date)
@@ -407,6 +407,43 @@ for (i in 1:(length(random.sample.stocks)/5)) {
   return.data <- return.data %>% add_column(return4.alpha = alpha4.cumul)
   return.data <- return.data %>% add_column(return5.alpha = alpha5.cumul)
   
+  sharpe.ratio1.cumul <- c()
+  sharpe.ratio2.cumul <- c()
+  sharpe.ratio3.cumul <- c()
+  sharpe.ratio4.cumul <- c()
+  sharpe.ratio5.cumul <- c()
+  for (j in 1:(length(shares1.data$ret.adjusted.prices)-1)) {
+    sharpe.ratio1.cumul <- c(sharpe.ratio1.cumul, (shares1.daily.return[j] - tbill.yield[j])/sqrt(var(shares1.list.cumul[[j]])))
+    sharpe.ratio2.cumul <- c(sharpe.ratio2.cumul, (shares2.daily.return[j] - tbill.yield[j])/sqrt(var(shares2.list.cumul[[j]])))
+    sharpe.ratio3.cumul <- c(sharpe.ratio3.cumul, (shares3.daily.return[j] - tbill.yield[j])/sqrt(var(shares3.list.cumul[[j]])))
+    sharpe.ratio4.cumul <- c(sharpe.ratio4.cumul, (shares4.daily.return[j] - tbill.yield[j])/sqrt(var(shares4.list.cumul[[j]])))
+    sharpe.ratio5.cumul <- c(sharpe.ratio5.cumul, (shares5.daily.return[j] - tbill.yield[j])/sqrt(var(shares5.list.cumul[[j]])))
+  }
+  return.data <- return.data %>% add_column(return1.sharpe.ratio = sharpe.ratio1.cumul)
+  return.data <- return.data %>% add_column(return2.sharpe.ratio = sharpe.ratio2.cumul)
+  return.data <- return.data %>% add_column(return3.sharpe.ratio = sharpe.ratio3.cumul)
+  return.data <- return.data %>% add_column(return4.sharpe.ratio = sharpe.ratio4.cumul)
+  return.data <- return.data %>% add_column(return5.sharpe.ratio = sharpe.ratio5.cumul)
+  
+  sortino.ratio1.cumul <- c()
+  sortino.ratio2.cumul <- c()
+  sortino.ratio3.cumul <- c()
+  sortino.ratio4.cumul <- c()
+  sortino.ratio5.cumul <- c()
+  for (j in 1:length(shares.daily.return)) {
+    sortino.ratio1.cumul <- c(sortino.ratio1.cumul, ((shares1.daily.return[j] - tbill.yield[j])/shares1.return.down.dev.cumul[j]))
+    sortino.ratio2.cumul <- c(sortino.ratio2.cumul, ((shares2.daily.return[j] - tbill.yield[j])/shares2.return.down.dev.cumul[j]))
+    sortino.ratio3.cumul <- c(sortino.ratio3.cumul, ((shares3.daily.return[j] - tbill.yield[j])/shares3.return.down.dev.cumul[j]))
+    sortino.ratio4.cumul <- c(sortino.ratio4.cumul, ((shares4.daily.return[j] - tbill.yield[j])/shares4.return.down.dev.cumul[j]))
+    sortino.ratio5.cumul <- c(sortino.ratio5.cumul, ((shares5.daily.return[j] - tbill.yield[j])/shares5.return.down.dev.cumul[j]))
+  }
+  return.data <- return.data %>% add_column(return1.sortino.ratio = sortino.ratio1.cumul)
+  return.data <- return.data %>% add_column(return2.sortino.ratio = sortino.ratio2.cumul)
+  return.data <- return.data %>% add_column(return3.sortino.ratio = sortino.ratio3.cumul)
+  return.data <- return.data %>% add_column(return4.sortino.ratio = sortino.ratio4.cumul)
+  return.data <- return.data %>% add_column(return5.sortino.ratio = sortino.ratio5.cumul)
+  
+  
   
   plotlist[[1]] <- ggplot() +
     geom_line(data = return.data, aes(date, shares1.return.perc, 
@@ -533,7 +570,7 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+3], ', ', 
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
-           undertitle = 'Cumulative Down Deviation', x = 'date', y = 'Beta') +
+           undertitle = 'Cumulative Beta', x = 'date', y = 'Beta') +
       scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
                                                        "#FF9933", "#006600"))
     plotlist[[6]] <- ggplot() +
@@ -557,16 +594,61 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+3], ', ', 
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
-           undertitle = 'Cumulative Down Deviation', x = 'date', y = 'Alpha') +
+           undertitle = 'Cumulative Alpha', x = 'date', y = 'Alpha') +
       scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
                                                        "#FF9933", "#006600"))
-    masterplotlist[[i]] <- list(plotlist[[1]], plotlist[[2]], plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]])
+    plotlist[[7]] <- ggplot() +
+      geom_line(data = return.data, aes(date, return1.sharpe.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+1])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return2.sharpe.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+2])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return3.sharpe.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+3])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return4.sharpe.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+4])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return5.sharpe.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+5])), 
+                size = 1) +
+      labs(title = paste0(random.sample.stocks[(i-1)*5+1], ', ', 
+                          random.sample.stocks[(i-1)*5+2], ', ', 
+                          random.sample.stocks[(i-1)*5+3], ', ', 
+                          random.sample.stocks[(i-1)*5+4], ', ', 
+                          random.sample.stocks[(i-1)*5+5]), 
+           undertitle = 'Cumulative Sharpe Ratio', x = 'date', y = 'Sharpe Ratio') +
+      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600"))
+    plotlist[[8]] <- ggplot() +
+      geom_line(data = return.data, aes(date, return1.sortino.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+1])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return2.sortino.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+2])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return3.sortino.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+3])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return4.sortino.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+4])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return5.sortino.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+5])), 
+                size = 1) +
+      labs(title = paste0(random.sample.stocks[(i-1)*5+1], ', ', 
+                          random.sample.stocks[(i-1)*5+2], ', ', 
+                          random.sample.stocks[(i-1)*5+3], ', ', 
+                          random.sample.stocks[(i-1)*5+4], ', ', 
+                          random.sample.stocks[(i-1)*5+5]), 
+           undertitle = 'Cumulative Sortino Ratio', x = 'date', y = 'Sortino Ratio') +
+      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600"))
+    masterplotlist[[i]] <- list(plotlist[[1]], plotlist[[2]], plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]], plotlist[[7]], plotlist[[8]])
 }
 for (i in 1:length(masterplotlist)) {
-  grid.arrange(masterplotlist[[i]][[1]], masterplotlist[[i]][[2]], masterplotlist[[i]][[3]], masterplotlist[[i]][[4]], masterplotlist[[i]][[5]], masterplotlist[[i]][[6]])
+  grid.arrange(masterplotlist[[i]][[1]], masterplotlist[[i]][[2]], masterplotlist[[i]][[3]], masterplotlist[[i]][[4]], masterplotlist[[i]][[5]], masterplotlist[[i]][[6]], masterplotlist[[i]][[7]], masterplotlist[[i]][[8]])
 }
 
-grid.arrange(plotlist[[1]], plotlist[[2]])
-grid.arrange(plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]])
-grid.arrange(plotlist[[7]], plotlist[[8]], plotlist[[9]], plotlist[[10]])
 
