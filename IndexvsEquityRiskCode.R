@@ -430,7 +430,7 @@ for (i in 1:(length(random.sample.stocks)/5)) {
   sortino.ratio3.cumul <- c()
   sortino.ratio4.cumul <- c()
   sortino.ratio5.cumul <- c()
-  for (j in 1:length(shares.daily.return)) {
+  for (j in 1:(length(shares1.data$ret.adjusted.prices)-1)) {
     sortino.ratio1.cumul <- c(sortino.ratio1.cumul, ((shares1.daily.return[j] - tbill.yield[j])/shares1.return.down.dev.cumul[j]))
     sortino.ratio2.cumul <- c(sortino.ratio2.cumul, ((shares2.daily.return[j] - tbill.yield[j])/shares2.return.down.dev.cumul[j]))
     sortino.ratio3.cumul <- c(sortino.ratio3.cumul, ((shares3.daily.return[j] - tbill.yield[j])/shares3.return.down.dev.cumul[j]))
@@ -443,7 +443,23 @@ for (i in 1:(length(random.sample.stocks)/5)) {
   return.data <- return.data %>% add_column(return4.sortino.ratio = sortino.ratio4.cumul)
   return.data <- return.data %>% add_column(return5.sortino.ratio = sortino.ratio5.cumul)
   
-  
+  treynor.ratio1.cumul <- c()
+  treynor.ratio2.cumul <- c()
+  treynor.ratio3.cumul <- c()
+  treynor.ratio4.cumul <- c()
+  treynor.ratio5.cumul <- c()
+  for (j in 1:(length(shares1.data$ret.adjusted.prices)-1)) {
+    treynor.ratio1.cumul <- c(treynor.ratio1.cumul, (shares1.daily.return[j] - tbill.yield[j])/beta1.cumul[j])
+    treynor.ratio2.cumul <- c(treynor.ratio2.cumul, (shares2.daily.return[j] - tbill.yield[j])/beta2.cumul[j])
+    treynor.ratio3.cumul <- c(treynor.ratio3.cumul, (shares3.daily.return[j] - tbill.yield[j])/beta3.cumul[j])
+    treynor.ratio4.cumul <- c(treynor.ratio4.cumul, (shares4.daily.return[j] - tbill.yield[j])/beta4.cumul[j])
+    treynor.ratio5.cumul <- c(treynor.ratio5.cumul, (shares5.daily.return[j] - tbill.yield[j])/beta5.cumul[j])
+  }
+  return.data <- return.data %>% add_column(return1.treynor.ratio = treynor.ratio1.cumul)
+  return.data <- return.data %>% add_column(return2.treynor.ratio = treynor.ratio2.cumul)
+  return.data <- return.data %>% add_column(return3.treynor.ratio = treynor.ratio3.cumul)
+  return.data <- return.data %>% add_column(return4.treynor.ratio = treynor.ratio4.cumul)
+  return.data <- return.data %>% add_column(return5.treynor.ratio = treynor.ratio5.cumul)
   
   plotlist[[1]] <- ggplot() +
     geom_line(data = return.data, aes(date, shares1.return.perc, 
@@ -645,10 +661,34 @@ for (i in 1:(length(random.sample.stocks)/5)) {
            undertitle = 'Cumulative Sortino Ratio', x = 'date', y = 'Sortino Ratio') +
       scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
                                                        "#FF9933", "#006600"))
-    masterplotlist[[i]] <- list(plotlist[[1]], plotlist[[2]], plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]], plotlist[[7]], plotlist[[8]])
+    plotlist[[9]] <- ggplot() +
+      geom_line(data = return.data, aes(date, return1.treynor.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+1])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return2.treynor.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+2])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return3.treynor.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+3])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return4.treynor.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+4])), 
+                size = 1) +
+      geom_line(data = return.data, aes(date, return5.treynor.ratio, 
+                                        colour = paste0(random.sample.stocks[(i-1)*5+5])), 
+                size = 1) +
+      labs(title = paste0(random.sample.stocks[(i-1)*5+1], ', ', 
+                          random.sample.stocks[(i-1)*5+2], ', ', 
+                          random.sample.stocks[(i-1)*5+3], ', ', 
+                          random.sample.stocks[(i-1)*5+4], ', ', 
+                          random.sample.stocks[(i-1)*5+5]), 
+           undertitle = 'Cumulative Treynor Ratio', x = 'date', y = 'Treynor Ratio') +
+      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600"))
+    masterplotlist[[i]] <- list(plotlist[[1]], plotlist[[2]], plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]], plotlist[[7]], plotlist[[8]], plotlist[[9]])
 }
 for (i in 1:length(masterplotlist)) {
-  grid.arrange(masterplotlist[[i]][[1]], masterplotlist[[i]][[2]], masterplotlist[[i]][[3]], masterplotlist[[i]][[4]], masterplotlist[[i]][[5]], masterplotlist[[i]][[6]], masterplotlist[[i]][[7]], masterplotlist[[i]][[8]])
+  grid.arrange(masterplotlist[[i]][[1]], masterplotlist[[i]][[2]], masterplotlist[[i]][[3]], masterplotlist[[i]][[4]], masterplotlist[[i]][[5]], masterplotlist[[i]][[6]], masterplotlist[[i]][[7]], masterplotlist[[i]][[8]], masterplotlist[[i]][[9]])
 }
 
 
