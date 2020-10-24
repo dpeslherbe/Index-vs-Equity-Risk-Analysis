@@ -105,7 +105,7 @@ ggplot() +
   geom_line(data = return.data, aes(date, shares.return.std.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.std.dev), color = 'black', size = 1) +
   labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Standard Deviation')
 
 shares.return.semi.dev.cumul <- c()
 index.return.semi.dev.cumul <- c()
@@ -123,7 +123,7 @@ ggplot() +
   geom_line(data = return.data, aes(date, shares.return.semi.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.semi.dev), color = 'black', size = 1) +
   labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Semi Deviation')
 
 shares.return.down.dev.cumul <- c()
 index.return.down.dev.cumul <- c()
@@ -141,7 +141,7 @@ ggplot() +
   geom_line(data = return.data, aes(date, shares.return.down.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.down.dev), color = 'black', size = 1) +
   labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Down Deviation')
 
 beta.cumul <-c()
 for (j in 1:length(shares.list.cumul)) {
@@ -151,7 +151,7 @@ return.data <- return.data %>% add_column(return.beta = beta.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.beta), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Beta'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Beta')
 
 url <- 'https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldYear&year=2020'
 webpage <- read_html(url)
@@ -159,24 +159,24 @@ tbill.yield <- webpage %>% html_nodes('.text_view_data:nth-child(6)') %>% html_t
 tbill.yield <- as.numeric(tbill.yield)/100
 
 alpha.cumul <- c()
-for (j in 1:length(shares.list.cumul)) {
+for (j in 1:length(shares.daily.return)) {
   alpha.cumul <- c(alpha.cumul, shares.daily.return[j] - (tbill.yield[j] + beta.cumul[j]*(index.daily.return[j] - tbill.yield[j])))
 }
 return.data <- return.data %>% add_column(return.alpha = alpha.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.alpha), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Alpha'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Alpha')
 
 sharpe.ratio.cumul <- c()
 for (j in 1:length(shares.daily.return)) {
-  sharpe.ratio.cumul <- c(sharpe.ratio.cumul, (shares.daily.return[j] - tbill.yield[j])/sqrt(var(shares.list.cumul[[j]])))
+  sharpe.ratio.cumul <- c(sharpe.ratio.cumul, (shares.daily.return[j] - tbill.yield[j])/sqrt(var(shares.list.cumul[[j]] - tbill.yield[j])))
 }
 return.data <- return.data %>% add_column(return.sharpe.ratio = sharpe.ratio.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.sharpe.ratio), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Sharpe Ratio'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Sharpe Ratio')
 
 sortino.ratio.cumul <- c()
 for (j in 1:length(shares.daily.return)) {
@@ -186,7 +186,7 @@ return.data <- return.data %>% add_column(return.sortino.ratio = sortino.ratio.c
 ggplot() +
   geom_line(data = return.data, aes(date, return.sortino.ratio), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Sortino Ratio'), 
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
 
 treynor.ratio.cumul <- c()
 for (j in 1:length(shares.daily.return)) {
@@ -196,7 +196,7 @@ return.data <- return.data %>% add_column(return.treynor.ratio = treynor.ratio.c
 ggplot() +
   geom_line(data = return.data, aes(date, return.treynor.ratio), color = 'blue', size = 1) +
   labs(title = paste0('MSCI vs ^GSPC Treynor Ratio'),
-       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'return percentage')
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
 
 
 
