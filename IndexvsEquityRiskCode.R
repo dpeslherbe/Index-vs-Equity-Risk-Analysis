@@ -587,8 +587,8 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
            undertitle = 'Cumulative Beta', x = 'date', y = 'Beta') +
-      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
-                                                       "#FF9933", "#006600"))
+      scale_color_manual(name = 'Equities', values = c("#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600", "#996633"))
     plotlist[[6]] <- ggplot() +
       geom_line(data = return.data, aes(date, return1.alpha, 
                                         colour = paste0(random.sample.stocks[(i-1)*5+1])), 
@@ -611,8 +611,8 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
            undertitle = 'Cumulative Alpha', x = 'date', y = 'Alpha') +
-      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
-                                                       "#FF9933", "#006600"))
+      scale_color_manual(name = 'Equities', values = c("#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600", "#996633"))
     plotlist[[7]] <- ggplot() +
       geom_line(data = return.data, aes(date, return1.sharpe.ratio, 
                                         colour = paste0(random.sample.stocks[(i-1)*5+1])), 
@@ -635,8 +635,8 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
            undertitle = 'Cumulative Sharpe Ratio', x = 'date', y = 'Sharpe Ratio') +
-      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
-                                                       "#FF9933", "#006600"))
+      scale_color_manual(name = 'Equities', values = c("#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600", "#996633"))
     plotlist[[8]] <- ggplot() +
       geom_line(data = return.data, aes(date, return1.sortino.ratio, 
                                         colour = paste0(random.sample.stocks[(i-1)*5+1])), 
@@ -659,8 +659,8 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
            undertitle = 'Cumulative Sortino Ratio', x = 'date', y = 'Sortino Ratio') +
-      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
-                                                       "#FF9933", "#006600"))
+      scale_color_manual(name = 'Equities', values = c("#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600", "#996633"))
     plotlist[[9]] <- ggplot() +
       geom_line(data = return.data, aes(date, return1.treynor.ratio, 
                                         colour = paste0(random.sample.stocks[(i-1)*5+1])), 
@@ -683,8 +683,8 @@ for (i in 1:(length(random.sample.stocks)/5)) {
                           random.sample.stocks[(i-1)*5+4], ', ', 
                           random.sample.stocks[(i-1)*5+5]), 
            undertitle = 'Cumulative Treynor Ratio', x = 'date', y = 'Treynor Ratio') +
-      scale_color_manual(name = 'Equities', values = c("#000000", "#FF3300", "#0066CC",
-                                                       "#FF9933", "#006600"))
+      scale_color_manual(name = 'Equities', values = c("#FF3300", "#0066CC",
+                                                       "#FF9933", "#006600", "#996633"))
     masterplotlist[[i]] <- list(plotlist[[1]], plotlist[[2]], plotlist[[3]], plotlist[[4]], plotlist[[5]], plotlist[[6]], plotlist[[7]], plotlist[[8]], plotlist[[9]])
 }
 for (i in 1:length(masterplotlist)) {
