@@ -42,9 +42,9 @@ Beta :white_check_mark:
 
 Alpha :white_check_mark:
 
-Sharpe Ratio
+Sharpe Ratio :white_check_mark:
 
-Sortino Ratio
+Sortino Ratio :white_check_mark:
 
 Treynor Ratio
 
