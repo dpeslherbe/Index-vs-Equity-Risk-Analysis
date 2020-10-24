@@ -8,7 +8,7 @@ Using standard financial risk assessment methods (cumulative returns, standard d
 
 **Random Sampling:**
 
-*First Analysis (on first random stock):*
+*First Analysis (on first random stock):* :ballot_box_with_check:
 
 Cumulative Returns :white_check_mark:
 
@@ -28,7 +28,7 @@ Sortino Ratio :white_check_mark:
 
 Treynor Ratio :white_check_mark:
 
-*Second Analysis (on the other randomly selected stocks):*
+*Second Analysis (on the other randomly selected stocks):* :ballot_box_with_check:
 
 Cumulative Returns :white_check_mark:
 
@@ -46,7 +46,7 @@ Sharpe Ratio :white_check_mark:
 
 Sortino Ratio :white_check_mark:
 
-Treynor Ratio
+Treynor Ratio :white_check_mark:
 
 *Third Analysis (portfolio equally composed of all randomly selected equities):*
 
