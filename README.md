@@ -6,7 +6,9 @@ Risk-free Return data is US 1-year Treasury Bill web scraped from https://www.tr
 
 Using standard financial risk assessment methods (cumulative returns, standard deviation, semi-deviation, downward deviation, beta, alpha, Sharpe ratio, Sortino ratio, Treynor Ratio), and statistical knowledge (random sampling, clustering, stratified sampling), we look at the differences in risk between the S&P 500 Index benchmark and selected equities over the current financial year.
 
-**Random Sampling:**
+
+**Part 1** *(Complete)*
+*Random Sampling:*
 
 *First Analysis (on first random stock):* :ballot_box_with_check:
 
@@ -48,6 +50,8 @@ Sortino Ratio :white_check_mark:
 
 Treynor Ratio :white_check_mark:
 
+**Part 2** *(In Progess)*
+
 *Third Analysis (portfolio equally composed of all randomly selected equities):*
 
 Cumulative Returns
@@ -88,6 +92,8 @@ Sortino Ratio
 
 Treynor Ratio
 
-**Equity Clustering (TBD)**
+**Part 3** *(To be explored depending on results from Part 2)*
 
-**Stratified Sampling (TBD)**
+*Equity Clustering (TBD)*
+
+*Stratified Sampling (TBD)*
