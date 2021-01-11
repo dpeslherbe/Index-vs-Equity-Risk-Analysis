@@ -11,7 +11,7 @@ tickers <- webpage %>% html_nodes('#constituents td:nth-child(1)') %>% html_text
 tickers <- sub('\n', '', tickers)
 tickers <- sub('\\.', '-', tickers)
 start.date <- '2020-01-01'
-end.date <- Sys.Date()
+end.date <- '2020-12-31'
 frequency.of.data <- 'daily'
 
 stocks <- BatchGetSymbols(tickers = tickers, first.date = start.date,
@@ -67,12 +67,12 @@ return.data <- return.data %>% add_column(index.return.perc = index.daily.return
 ggplot() +
   geom_line(data = return.data, aes(date, shares.return.perc), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.perc), color = 'black', size = 1) +
-  labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
+  labs(title = paste0('MS (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative return', x = 'date', y = 'return percentage')
 
 shares.return.YTD <- return.data$shares.return.perc[dim(return.data)[1]]
 index.return.YTD <- return.data$index.return.perc[dim(return.data)[1]]
-print(c('MSCI YTD return is ', shares.return.YTD))
+print(c('MS YTD return is ', shares.return.YTD))
 print(c('^GSPC YTD return is ', index.return.YTD))
 
 shares.return.std.dev.YTD <- sqrt(sum((shares.data$ret.adjusted.prices[-1] - shares.return.YTD)^2))
@@ -104,7 +104,7 @@ return.data <- return.data %>% add_column(index.return.std.dev = index.return.st
 ggplot() +
   geom_line(data = return.data, aes(date, shares.return.std.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.std.dev), color = 'black', size = 1) +
-  labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
+  labs(title = paste0('MS (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Standard Deviation')
 
 shares.return.semi.dev.cumul <- c()
@@ -122,7 +122,7 @@ return.data <- return.data %>% add_column(index.return.semi.dev = index.return.s
 ggplot() +
   geom_line(data = return.data, aes(date, shares.return.semi.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.semi.dev), color = 'black', size = 1) +
-  labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
+  labs(title = paste0('MS (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Semi Deviation')
 
 shares.return.down.dev.cumul <- c()
@@ -140,7 +140,7 @@ return.data <- return.data %>% add_column(index.return.down.dev = index.return.d
 ggplot() +
   geom_line(data = return.data, aes(date, shares.return.down.dev), color = 'blue', size = 1) +
   geom_line(data = return.data, aes(date, index.return.down.dev), color = 'black', size = 1) +
-  labs(title = paste0('MSCI (blue) vs ^GSPC (black)'), 
+  labs(title = paste0('MS (blue) vs ^GSPC (black)'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Down Deviation')
 
 beta.cumul <-c()
@@ -150,7 +150,7 @@ for (j in 1:length(shares.list.cumul)) {
 return.data <- return.data %>% add_column(return.beta = beta.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.beta), color = 'blue', size = 1) +
-  labs(title = paste0('MSCI vs ^GSPC Beta'), 
+  labs(title = paste0('MS vs ^GSPC Beta'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Beta')
 
 url <- 'https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldYear&year=2020'
@@ -165,7 +165,7 @@ for (j in 1:length(shares.daily.return)) {
 return.data <- return.data %>% add_column(return.alpha = alpha.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.alpha), color = 'blue', size = 1) +
-  labs(title = paste0('MSCI vs ^GSPC Alpha'), 
+  labs(title = paste0('MS vs ^GSPC Alpha'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Alpha')
 
 sharpe.ratio.cumul <- c()
@@ -175,7 +175,7 @@ for (j in 1:length(shares.daily.return)) {
 return.data <- return.data %>% add_column(return.sharpe.ratio = sharpe.ratio.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.sharpe.ratio), color = 'blue', size = 1) +
-  labs(title = paste0('MSCI vs ^GSPC Sharpe Ratio'), 
+  labs(title = paste0('MS vs ^GSPC Sharpe Ratio'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Sharpe Ratio')
 
 sortino.ratio.cumul <- c()
@@ -185,7 +185,7 @@ for (j in 1:length(shares.daily.return)) {
 return.data <- return.data %>% add_column(return.sortino.ratio = sortino.ratio.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.sortino.ratio), color = 'blue', size = 1) +
-  labs(title = paste0('MSCI vs ^GSPC Sortino Ratio'), 
+  labs(title = paste0('MS vs ^GSPC Sortino Ratio'), 
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
 
 treynor.ratio.cumul <- c()
@@ -195,7 +195,7 @@ for (j in 1:length(shares.daily.return)) {
 return.data <- return.data %>% add_column(return.treynor.ratio = treynor.ratio.cumul)
 ggplot() +
   geom_line(data = return.data, aes(date, return.treynor.ratio), color = 'blue', size = 1) +
-  labs(title = paste0('MSCI vs ^GSPC Treynor Ratio'),
+  labs(title = paste0('MS vs ^GSPC Treynor Ratio'),
        undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
 
 
@@ -690,5 +690,51 @@ for (i in 1:(length(random.sample.stocks)/5)) {
 for (i in 1:length(masterplotlist)) {
   grid.arrange(masterplotlist[[i]][[1]], masterplotlist[[i]][[2]], masterplotlist[[i]][[3]], masterplotlist[[i]][[4]], masterplotlist[[i]][[5]], masterplotlist[[i]][[6]], masterplotlist[[i]][[7]], masterplotlist[[i]][[8]], masterplotlist[[i]][[9]])
 }
+
+
+
+
+
+
+
+
+
+equities <- vector(mode = 'list', length = 50)
+share.values <- c(rep(0, 50))
+for (i in 1:50) {
+  share.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[i])
+  share.values[i] <- share.data[1,6]
+  equity.return <- share.values[i] * (cumprod(1+(share.data$ret.adjusted.prices[-1]))-1)
+  equities[[i]] <- equity.return
+}
+share.weights <- share.values/sum(share.values)
+cumul.return <- 0
+for (i in 1:50) {
+  cumul.return <- cumul.return + (share.weights[i] * equities[[i]])
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
