@@ -51,6 +51,7 @@ Sortino Ratio :white_check_mark:
 Treynor Ratio :white_check_mark:
 
 **Part 2** *(In Progess)*
+*Randomly Sampled Portfolios*
 
 *Third Analysis (portfolio equally composed of all randomly selected equities):*
 
@@ -93,6 +94,7 @@ Sortino Ratio
 Treynor Ratio
 
 **Part 3** *(To be explored depending on results from Part 2)*
+*Other sampling methods for portfolio creation*
 
 *Equity Clustering (TBD)*
 
