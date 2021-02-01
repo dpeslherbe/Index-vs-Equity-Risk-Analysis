@@ -42,7 +42,8 @@ stocks$df.control <- stocks$df.control %>%
   filter((threshold.decision != 'OUT'))
 
 set.seed(1)
-random.sampling.index <- sample(valid.index, 50, replace = FALSE)
+random.sampling.index <- sample(valid.index, 26, replace = FALSE)
+random.sampling.index <- random.sampling.index[-2]
 random.sample.stocks <- stocks$df.control$ticker[random.sampling.index]
 random.sample.stocks
 
@@ -699,25 +700,127 @@ for (i in 1:length(masterplotlist)) {
 
 
 
-equities <- vector(mode = 'list', length = 50)
-share.values <- c(rep(0, 50))
-for (i in 1:50) {
+equities <- vector(mode = 'list', length = 25)
+share.values <- c(rep(0, 25))
+for (i in 1:25) {
   share.data <- filter(stocks$df.tickers, ticker == random.sample.stocks[i])
   share.values[i] <- share.data[1,6]
   equity.return <- share.values[i] * (cumprod(1+(share.data$ret.adjusted.prices[-1]))-1)
   equities[[i]] <- equity.return
 }
 share.weights <- share.values/sum(share.values)
+inv.capital <- sum(share.values)
 cumul.return <- 0
-for (i in 1:50) {
+for (i in 1:25) {
   cumul.return <- cumul.return + (share.weights[i] * equities[[i]])
 }
+cumul.perc <- cumul.return/inv.capital
+index.cumul.return <- inv.capital * index.daily.return
+index.cumul.perc <- index.cumul.return/inv.capital
 
+return.data <- tibble(date = index.data$ref.date[-1])
+return.data <- return.data %>% add_column(portfolio.return.perc = cumul.perc)
+return.data <- return.data %>% add_column(index.return.perc = index.cumul.perc)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.perc), color = 'blue', size = 1) +
+  geom_line(data = return.data, aes(date, index.return.perc), color = 'black', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC (black)'), 
+       undertitle = 'Cumulative return', x = 'date', y = 'return percentage')
 
+portfolio.return.mean.cumul <- c()
+index.return.mean.cumul <- c()
+for (i in 2:(length(index.data$ret.adjusted.prices)-1)) {
+  portfolio.return.mean.cumul <- c(portfolio.return.mean.cumul, 
+                                mean(cumul.perc[1:i]))
+  index.return.mean.cumul <- c(index.return.mean.cumul, 
+                               mean(index.data$ret.adjusted.prices[2:i]))
+}
+portfolio.list.cumul <- vector(mode = 'list', length = 
+                              (length(index.data$ret.adjusted.prices)-1))
+index.list.cumul <- vector(mode = 'list', length = 
+                             (length(index.data$ret.adjusted.prices)-1))
+portfolio.return.std.dev.cumul <- c()
+index.return.std.dev.cumul <- c()
+for (j in 1:(length(index.data$ret.adjusted.prices)-1)) {
+  portfolio.list.cumul[[j]] <- c(cumul.perc[1:j])
+  portfolio.return.std.dev.cumul <- c(portfolio.return.std.dev.cumul, 
+                                   sqrt(sum((portfolio.list.cumul[[j]] - 
+                                               portfolio.return.mean.cumul[j])^2)))
+  index.list.cumul[[j]] <- c(index.data$ret.adjusted.prices[2:(1+j)])
+  index.return.std.dev.cumul <- c(index.return.std.dev.cumul, 
+                                  sqrt(sum((index.list.cumul[[j]] - 
+                                              index.return.mean.cumul[j])^2)))
+}
+return.data <- return.data %>% add_column(portfolio.return.std.dev = 
+                                            portfolio.return.std.dev.cumul)
+return.data <- return.data %>% add_column(index.return.std.dev = 
+                                            index.return.std.dev.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.std.dev), color = 'blue', 
+            size = 1) +
+  geom_line(data = return.data, aes(date, index.return.std.dev), color = 'black', 
+            size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC (black)'), 
+       undertitle = 'Cumulative standard deviations over the year', 
+       x = 'date', y = 'Standard Deviation')
 
+portfolio.return.semi.dev.cumul <- c()
+index.return.semi.dev.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.return.cumul <- portfolio.list.cumul[[j]]
+  portfolio.return.semi.dev.values <- portfolio.return.cumul[portfolio.return.cumul <= 
+                                                         mean(portfolio.return.cumul)]
+  portfolio.return.semi.dev.cumul <- c(portfolio.return.semi.dev.cumul, 
+                                    sqrt((1/length(portfolio.return.semi.dev.values))*
+                                           sum((portfolio.return.semi.dev.values - 
+                                                  mean(portfolio.return.cumul))^2)))
+  index.return.cumul <- index.list.cumul[[j]]
+  index.return.semi.dev.values <- index.return.cumul[index.return.cumul <=
+                                                       mean(index.return.cumul)]
+  index.return.semi.dev.cumul <- c(index.return.semi.dev.cumul, 
+                                   sqrt((1/length(index.return.semi.dev.values))*
+                                          sum((index.return.semi.dev.values - 
+                                                 mean(index.return.cumul))^2)))
+}
+return.data <- return.data %>% add_column(portfolio.return.semi.dev = 
+                                            portfolio.return.semi.dev.cumul)
+return.data <- return.data %>% add_column(index.return.semi.dev = 
+                                            index.return.semi.dev.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.semi.dev), color = 'blue', 
+            size = 1) +
+  geom_line(data = return.data, aes(date, index.return.semi.dev), color = 'black', 
+            size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC (black)'), 
+       undertitle = 'Cumulative standard deviations over the year', 
+       x = 'date', y = 'Semi Deviation')
 
-
-
+portfolio.return.down.dev.cumul <- c()
+index.return.down.dev.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.return.cumul <- portfolio.list.cumul[[j]]
+  portfolio.return.down.dev.values <- portfolio.return.cumul[portfolio.return.cumul <= 0]
+  portfolio.return.down.dev.cumul <- c(portfolio.return.down.dev.cumul, 
+                                    sqrt((1/length(portfolio.return.down.dev.values))*
+                                           sum((portfolio.return.down.dev.values))^2))
+  index.return.cumul <- index.list.cumul[[j]]
+  index.return.down.dev.values <- index.return.cumul[index.return.cumul <= 0]
+  index.return.down.dev.cumul <- c(index.return.down.dev.cumul, 
+                                   sqrt((1/length(index.return.down.dev.values))*
+                                          sum((index.return.down.dev.values))^2))
+}
+return.data <- return.data %>% add_column(portfolio.return.down.dev = 
+                                            portfolio.return.down.dev.cumul)
+return.data <- return.data %>% add_column(index.return.down.dev = 
+                                            index.return.down.dev.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.down.dev), color = 'blue', 
+            size = 1) +
+  geom_line(data = return.data, aes(date, index.return.down.dev), color = 'black', 
+            size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC (black)'), 
+       undertitle = 'Cumulative standard deviations over the year', 
+       x = 'date', y = 'Down Deviation')
 
 
 
