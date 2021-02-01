@@ -6,6 +6,13 @@ Risk-free Return data is US 1-year Treasury Bill web scraped from https://www.tr
 
 Using standard financial risk assessment methods (cumulative returns, standard deviation, semi-deviation, downward deviation, beta, alpha, Sharpe ratio, Sortino ratio, Treynor Ratio), and statistical knowledge (random sampling, clustering, stratified sampling), we look at the differences in risk between the S&P 500 Index benchmark and selected equities over the current financial year.
 
+## *Disclaimer*
+
+I am not a registered investment, legal or tax advisor or a broker/dealer. All investment/financial opinions from this report are from personal research and intended as educational material. Although best efforts are made to ensure all information is accurate, occasionally unintended errors and misprints may occur.
+**Do your own Research.**
+While this report provides mathematical and financial comparison between single equity and index investing for informational purposes only, it is very important to do your own analysis before making any investment based on your own personal circumstances. Nothing available in this report should be understood or construed as a recommendation or financial advice.
+Past performance is not a guarantee of future return, nor is it necessarily indicative of future performance. Keep in mind investing involves risk. The value of your investment will fluctuate over time and you may gain or lose money.
+
 
 **Part 1** *(Complete)*
 *Random Sampling:*
