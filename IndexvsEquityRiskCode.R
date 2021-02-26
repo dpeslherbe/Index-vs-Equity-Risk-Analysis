@@ -828,6 +828,59 @@ ggplot() +
 
 
 
+portfolio.return.beta.cumul <-c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.return.beta.cumul <- c(portfolio.return.beta.cumul, cov(portfolio.return.cumul[1:j], index.return.cumul[1:j])/var(portfolio.return.cumul[1:j]))
+}
+return.data <- return.data %>% add_column(portfolio.return.beta = portfolio.return.beta.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.beta), color = 'blue', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC Beta'), 
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Beta')
+
+
+portfolio.return.alpha.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.return.alpha.cumul <- c(portfolio.return.alpha.cumul, portfolio.return.cumul[j] - (tbill.yield[j] + portfolio.return.beta.cumul[j]*(index.return.cumul[j] - tbill.yield[j])))
+}
+return.data <- return.data %>% add_column(portfolio.return.alpha = portfolio.return.alpha.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.alpha), color = 'blue', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC Alpha'), 
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Alpha')
+
+
+portfolio.sharpe.ratio.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.sharpe.ratio.cumul <- c(portfolio.sharpe.ratio.cumul, (portfolio.return.cumul[j] - tbill.yield[j])/sqrt(var(portfolio.return.cumul[1:j] - tbill.yield[j])))
+}
+return.data <- return.data %>% add_column(portfolio.return.sharpe.ratio = portfolio.sharpe.ratio.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.sharpe.ratio), color = 'blue', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC Sharpe Ratio'), 
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Sharpe Ratio')
+
+
+portfolio.sortino.ratio.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.sortino.ratio.cumul <- c(portfolio.sortino.ratio.cumul, ((portfolio.return.cumul[j] - tbill.yield[j])/portfolio.return.down.dev.cumul[j]))
+}
+return.data <- return.data %>% add_column(portfolio.return.sortino.ratio = portfolio.sortino.ratio.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.sortino.ratio), color = 'blue', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC Sortino Ratio'), 
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
+
+
+portfolio.treynor.ratio.cumul <- c()
+for (j in 1:length(index.list.cumul)) {
+  portfolio.treynor.ratio.cumul <- c(portfolio.treynor.ratio.cumul, (portfolio.return.cumul[j] - tbill.yield[j])/portfolio.return.beta.cumul[j])
+}
+return.data <- return.data %>% add_column(portfolio.return.treynor.ratio = portfolio.treynor.ratio.cumul)
+ggplot() +
+  geom_line(data = return.data, aes(date, portfolio.return.treynor.ratio), color = 'blue', size = 1) +
+  labs(title = paste0('Random Portfolio (blue) vs ^GSPC Treynor Ratio'),
+       undertitle = 'Cumulative standard deviations over the year', x = 'date', y = 'Treynor Ratio')
 
 
 
