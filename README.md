@@ -10,7 +10,7 @@ Using standard financial risk assessment methods (cumulative returns, standard d
 
 I am not a registered investment, legal or tax advisor or a broker/dealer. All investment/financial opinions from this report are from personal research and intended as educational material. Although best efforts are made to ensure all information is accurate, occasionally unintended errors and misprints may occur.
 **Do your own Research.**
-While this report provides mathematical and financial comparison between single equity and index investing for informational purposes only, it is very important to do your own analysis before making any investment based on your own personal circumstances. Nothing available in this report should be understood or construed as a recommendation or financial advice.
+While these reports provides mathematical and financial comparisons between single equity, random portfolios and index investing for informational purposes only, it is very important to do your own analysis before making any investment based on your own personal circumstances. Nothing available in this report should be understood or construed as a recommendation or financial advice.
 Past performance is not a guarantee of future return, nor is it necessarily indicative of future performance. Keep in mind investing involves risk. The value of your investment will fluctuate over time and you may gain or lose money.
 
 
@@ -60,25 +60,25 @@ Treynor Ratio :white_check_mark:
 **Part 2** *(In Progess)*
 *Randomly Sampled Portfolios*
 
-*Third Analysis (portfolio equally composed of all randomly selected equities):*
+*Third Analysis (portfolio equally composed of all randomly selected equities):* :ballot_box_with_check:
 
-Cumulative Returns
+Cumulative Returns :white_check_mark:
 
-Standard Deviation
+Standard Deviation :white_check_mark:
 
-Semi-Deviation
+Semi-Deviation :white_check_mark:
 
-Downward Deviation
+Downward Deviation :white_check_mark:
 
-Beta
+Beta :white_check_mark:
 
-Alpha
+Alpha :white_check_mark:
 
-Sharpe Ratio
+Sharpe Ratio :white_check_mark:
 
-Sortino Ratio
+Sortino Ratio :white_check_mark:
 
-Treynor Ratio
+Treynor Ratio :white_check_mark:
 
 *Fourth Analysis (use random sampling multiple times to assess value of randomly selected equity portfolios):*
 
