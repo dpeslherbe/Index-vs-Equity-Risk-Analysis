@@ -60,25 +60,25 @@ Treynor Ratio :white_check_mark:
 **Part 2** *(In Progess)*
 *Randomly Sampled Portfolios*
 
-*Third Analysis (portfolio equally composed of all randomly selected equities):*
+*Third Analysis (portfolio equally composed of all randomly selected equities):* :ballot_box_with_check:
 
-Cumulative Returns
+Cumulative Returns :white_check_mark:
 
-Standard Deviation
+Standard Deviation :white_check_mark:
 
-Semi-Deviation
+Semi-Deviation :white_check_mark:
 
-Downward Deviation
+Downward Deviation :white_check_mark:
 
-Beta
+Beta :white_check_mark:
 
-Alpha
+Alpha :white_check_mark:
 
-Sharpe Ratio
+Sharpe Ratio :white_check_mark:
 
-Sortino Ratio
+Sortino Ratio :white_check_mark:
 
-Treynor Ratio
+Treynor Ratio :white_check_mark:
 
 *Fourth Analysis (use random sampling multiple times to assess value of randomly selected equity portfolios):*
 
